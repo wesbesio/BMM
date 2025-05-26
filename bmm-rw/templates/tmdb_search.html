@@ -1,0 +1,145 @@
+<!-- templates/tmdb_search.html - Updated to support both movie and TV search -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>TMDB Search</h1>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form action="/tmdb-search/" method="get" class="d-flex align-items-end">
+            <div class="me-3">
+                <label for="search_type" class="form-label">Search Type</label>
+                <select name="search_type" id="search_type" class="form-select" style="width: 120px;">
+                    <option value="movie" {% if search_type == "movie" %}selected{% endif %}>Movie</option>
+                    <option value="tv" {% if search_type == "tv" %}selected{% endif %}>TV Show</option>
+                </select>
+            </div>
+            <div class="flex-grow-1 me-2">
+                <label for="query" class="form-label">Search Query</label>
+                <input type="text" name="query" id="query" class="form-control" placeholder="Enter title..." value="{{ query }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+{% if results %}
+<div class="row mb-3">
+    <div class="col-md-12">
+        <h3>Search Results for "{{ query }}" ({{ search_type|title }})</h3>
+        <p>Found {{ total_results }} results (showing page {{ current_page }} of {{ total_pages }})</p>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>TMDB ID</th>
+                <th>Poster</th>
+                <th>Title</th>
+                <th>{% if search_type == "movie" %}Release Date{% else %}First Air Date{% endif %}</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in results %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>
+                    {% if item.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}" 
+                         alt="{% if search_type == 'movie' %}{{ item.original_title }}{% else %}{{ item.original_name }}{% endif %}" 
+                         class="img-thumbnail" style="max-height: 100px;">
+                    {% else %}
+                    <div class="text-muted">No poster</div>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if search_type == "movie" %}
+                        {{ item.original_title }}
+                        {% if item.title != item.original_title %}
+                            <br><small class="text-muted">({{ item.title }})</small>
+                        {% endif %}
+                    {% else %}
+                        {{ item.original_name }}
+                        {% if item.name != item.original_name %}
+                            <br><small class="text-muted">({{ item.name }})</small>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if search_type == "movie" %}
+                        {{ item.release_date or "Unknown" }}
+                    {% else %}
+                        {{ item.first_air_date or "Unknown" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if search_type == "movie" %}
+                        <a href="/media/create-from-tmdb/{{ item.id }}" class="btn btn-sm btn-success">
+                            <i class="bi bi-plus-circle"></i> Create Media
+                        </a>
+                    {% else %}
+                        <a href="/media/create-from-tmdb-tv/{{ item.id }}" class="btn btn-sm btn-success">
+                            <i class="bi bi-plus-circle"></i> Create Media
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<nav aria-label="Search results pagination">
+    <ul class="pagination justify-content-center">
+        <!-- Previous button -->
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="/tmdb-search/?query={{ query }}&search_type={{ search_type }}&page={{ current_page - 1 }}">
+                Previous
+            </a>
+        </li>
+        
+        <!-- Page numbers -->
+        {% set start_page = [1, current_page - 2]|max %}
+        {% set end_page = [total_pages, start_page + 4]|min %}
+        {% if end_page - start_page < 4 %}
+            {% set start_page = [1, end_page - 4]|max %}
+        {% endif %}
+        
+        {% for p in range(start_page, end_page + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link" href="/tmdb-search/?query={{ query }}&search_type={{ search_type }}&page={{ p }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+        
+        <!-- Next button -->
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link" href="/tmdb-search/?query={{ query }}&search_type={{ search_type }}&page={{ current_page + 1 }}">
+                Next
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+
+{% elif query %}
+<div class="alert alert-info">
+    No results found for "{{ query }}" in {{ search_type|title }} category. Please try a different search term or change the search type.
+</div>
+{% else %}
+<div class="alert alert-secondary">
+    <h5>Search for Movies and TV Shows</h5>
+    <p>Select whether you want to search for movies or TV shows, then enter a title to search the TMDB database.</p>
+    <ul>
+        <li><strong>Movie:</strong> Search for theatrical films</li>
+        <li><strong>TV Show:</strong> Search for television series and shows</li>
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+<!-- templates-readonly/home.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to Media Assets Viewer</h1>
+    <p class="lead">View your media collection and assets. This is a read-only version of the application.</p>
+    <hr class="my-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Media Collection</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">There are <strong>{{ media_count }}</strong> media items in the collection.</p>
+                    <a href="/media/" class="btn btn-primary">View Media</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">Assets</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">There are <strong>{{ asset_count }}</strong> assets in the collection.</p>
+                    <a href="/assets/" class="btn btn-secondary">View Assets</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

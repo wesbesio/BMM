@@ -1,0 +1,36 @@
+<!-- templates/home.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to BMM</h1>
+    <p class="lead">Manage your media collection and assets with ease.</p>
+    <hr class="my-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Media Collection</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">You have <strong>{{ media_count }}</strong> media items in your collection.</p>
+                    <a href="/media/" class="btn btn-primary">View Media</a>
+                    <a href="/media/new" class="btn btn-success">Add New Media</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">Assets</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">You have <strong>{{ asset_count }}</strong> assets in your collection.</p>
+                    <a href="/assets/" class="btn btn-secondary">View Assets</a>
+                    <a href="/assets/new" class="btn btn-success">Add New Asset</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+<!-- templates/asset_form.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Create New Asset</h1>
+
+<form action="/assets/new" method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" id="title" name="title">
+            </div>
+            
+            <div class="form-group">
+                <label for="subtitle">Subtitle</label>
+                <input type="text" class="form-control" id="subtitle" name="subtitle">
+            </div>
+            
+            <div class="form-group">
+                <label for="format">Format</label>
+                <select class="form-select" id="format" name="format">
+                    <option value="" {% if not format %}selected{% endif %}>Select Format</option>
+                    <option value="DVD" {% if format == "DVD" %}selected{% endif %}>DVD</option>
+                    <option value="Blu-Ray" {% if format == "Blu-Ray" %}selected{% endif %}>Blu-Ray</option>
+                    <option value="iTunes" {% if format == "iTunes" %}selected{% endif %}>iTunes</option>
+                    <option value="Amazon" {% if format == "Amazon" %}selected{% endif %}>Amazon</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" name="location">
+            </div>
+            
+            <div class="form-group">
+                <label for="imageurl">Image URL</label>
+                <div class="input-group">
+                    <span class="input-group-text">https://image.tmdb.org/t/p/w92</span>
+                    <input type="text" class="form-control" id="imageurl" name="imageurl" 
+                           placeholder="Enter image path">
+                </div>
+                <small class="form-text text-muted">Image path will be appended to TMDB base URL</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="image">Image</label>
+                <input type="text" class="form-control" id="image" name="image">
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="imdbid">IMDB ID</label>
+                <input type="text" class="form-control" id="imdbid" name="imdbid">
+            </div>
+            
+            <div class="form-group">
+                <label for="tmdbid">TMDB ID</label>
+                <input type="number" class="form-control" id="tmdbid" name="tmdbid">
+            </div>
+            
+            <div class="form-group">
+                <label for="mtype">Media Type</label>
+                <select class="form-select" id="mtype" name="mtype">
+                    <option value="" {% if not mtype %}selected{% endif %}>Select Media Type</option>
+                    <option value="1" {% if mtype == 1 %}selected{% endif %}>Movie</option>
+                    <option value="2" {% if mtype == 2 %}selected{% endif %}>TV</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="isbn">ISBN</label>
+                <input type="text" class="form-control" id="isbn" name="isbn">
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+            </div>
+            
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="dupe" name="dupe" value="true">
+                <label class="form-check-label" for="dupe">Duplicate</label>
+            </div>
+            
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="active" name="active" value="true" checked>
+                <label class="form-check-label" for="active">Active</label>
+            </div>
+            
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="flag" name="flag" value="true">
+                <label class="form-check-label" for="flag">Flag</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group mt-4">
+        <label>Associated Media</label>
+        <select class="form-select" id="media_ids" name="media_ids">
+            <option value="">Select a Media Item</option>
+            {% for media in media_list %}
+            <option value="{{ media.id }}">{{ media.title }} {% if media.subtitle %}({{ media.subtitle }}){% endif %}</option>
+            {% endfor %}
+        </select>
+        <small class="form-text text-muted">Select the media item associated with this asset</small>
+    </div>
+    
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">Create Asset</button>
+        <a href="/assets/" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

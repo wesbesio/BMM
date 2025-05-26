@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>Asset Details</h1>
+    </div>
+    <div>
+        <div class="btn-group me-3">
+            {% if prev_id %}
+            <a href="/assets/{{ prev_id }}" class="btn btn-outline-primary">
+                <i class="bi bi-chevron-left"></i> Previous
+            </a>
+            {% else %}
+            <button class="btn btn-outline-primary" disabled>
+                <i class="bi bi-chevron-left"></i> Previous
+            </button>
+            {% endif %}
+            
+            {% if next_id %}
+            <a href="/assets/{{ next_id }}" class="btn btn-outline-primary">
+                Next <i class="bi bi-chevron-right"></i>
+            </a>
+            {% else %}
+            <button class="btn btn-outline-primary" disabled>
+                Next <i class="bi bi-chevron-right"></i>
+            </button>
+            {% endif %}
+        </div>
+        
+        <a href="/assets/{{ asset.id }}/edit" class="btn btn-warning">Edit</a>
+        <button class="btn btn-danger"
+                hx-post="/assets/{{ asset.id }}/delete"
+                hx-confirm="Are you sure you want to delete this asset?"
+                hx-target="body"
+                hx-swap="outerHTML"
+                hx-push-url="/assets/">
+            Delete
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="card-title mb-0">{{ asset.title }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {% if asset.imageurl %}
+                <img src="{{ asset.imageurl }}" alt="{{ asset.title }}" class="img-fluid mb-3">
+                {% endif %}
+                
+                <h6>Basic Information</h6>
+                <table class="table">
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ asset.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Title</th>
+                        <td>{{ asset.title }}</td>
+                    </tr>
+                    <tr>
+                        <th>Subtitle</th>
+                        <td>{{ asset.subtitle }}</td>
+                    </tr>
+                    <tr>
+                        <th>Format</th>
+                        <td>{{ asset.format }}</td>
+                    </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td>{{ asset.location }}</td>
+                    </tr>
+                    <tr>
+                        <th>Creation Date</th>
+                        <td>{{ asset.creation.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h6>Additional Details</h6>
+                <table class="table">
+                    <tr>
+                        <th>IMDB ID</th>
+                        <td>{{ asset.imdbid }}</td>
+                    </tr>
+                    <tr>
+                        <th>TMDB ID</th>
+                        <td>{{ asset.tmdbid }}</td>
+                    </tr>
+                    <tr>
+                        <th>ISBN</th>
+                        <td>{{ asset.isbn }}</td>
+                    </tr>
+                    <tr>
+                        <th>Media Type</th>
+                        <td>
+                            {% if asset.mtype == 1 %}
+                                Movie
+                            {% elif asset.mtype == 2 %}
+                                TV
+                            {% else %}
+                                {{ asset.mtype }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            {% if asset.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                            
+                            {% if asset.flag %}
+                            <span class="badge bg-warning text-dark">Flagged</span>
+                            {% endif %}
+                            
+                            {% if asset.dupe %}
+                            <span class="badge bg-info text-dark">Duplicate</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                
+                {% if asset.notes %}
+                <div class="card mb-3">
+                    <div class="card-header">Notes</div>
+                    <div class="card-body">
+                        <p class="card-text">{{ asset.notes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <h5 class="mt-4">Associated Media</h5>
+        {% if asset.media %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>IMDB ID</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for media in asset.media %}
+                    <tr>
+                        <td>{{ media.id }}</td>
+                        <td>{{ media.title }}</td>
+                        <td>{{ media.imdbid }}</td>
+                        <td>
+                            {% if media.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/media/{{ media.id }}" class="btn btn-sm btn-info">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No media associated with this asset.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

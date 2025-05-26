@@ -1,0 +1,8 @@
+# Media Assets Manager - Full Version Requirements
+fastapi>=0.95.1
+sqlmodel>=0.0.8
+jinja2>=3.1.2
+python-multipart>=0.0.6
+uvicorn>=0.22.0
+python-dotenv>=1.1.0
+# Install with: pip install -r requirements.txt
