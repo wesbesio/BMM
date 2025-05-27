@@ -1,4 +1,4 @@
-# main.py  version 1.41
+# main.py  version 1.42
 #
 from fastapi import FastAPI, Request, Form, Depends, Query, HTTPException, Header
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -161,18 +161,20 @@ async def home(request: Request, session: Session = Depends(get_session)):
     context.update({"media_count": media_count, "asset_count": asset_count})
     return templates.TemplateResponse("home.html", context)
 
-# TMDB Search Route - Updated to handle both movies and TV
+# TMDB Search Route - Updated with improved duplicate checking and debugging
 @app.get("/tmdb-search/", response_class=HTMLResponse)
 async def tmdb_search(
     request: Request,
     query: str = "",
     search_type: str = Query("movie", regex="^(movie|tv)$"),  # Validate search type
-    page: int = Query(1, ge=1)
+    page: int = Query(1, ge=1),
+    session: Session = Depends(get_session)
 ):
     results = []
     total_results = 0
     total_pages = 0
     current_page = page
+    existing_tmdb_ids = set()
     
     if query:
         # Determine the API endpoint based on search type
@@ -196,6 +198,52 @@ async def tmdb_search(
                 total_results = data.get("total_results", 0)
                 total_pages = data.get("total_pages", 0)
                 current_page = data.get("page", 1)
+                
+                # Check for existing media in database
+                if results:
+                    # Determine media type for database query
+                    mtype = 1 if search_type == "movie" else 2
+                    
+                    # Get all TMDB IDs from the current search results
+                    search_tmdb_ids = [item.get("id") for item in results if item.get("id")]
+                    
+                    print(f"DEBUG: Search type: {search_type}, mtype: {mtype}")
+                    print(f"DEBUG: Search TMDB IDs from API: {search_tmdb_ids}")
+                    
+                    if search_tmdb_ids:
+                        # Query database for existing media - get all records to debug
+                        all_media_query = select(Media.id, Media.title, Media.tmdbid, Media.mtype).where(
+                            Media.mtype == mtype
+                        )
+                        all_media = session.exec(all_media_query).all()
+                        
+                        print(f"DEBUG: All media with mtype {mtype}:")
+                        for media in all_media:
+                            print(f"  ID: {media.id}, Title: {media.title}, TMDB ID: {media.tmdbid}, Type: {media.mtype}")
+                        
+                        # Now get just the existing TMDB IDs that match our search
+                        existing_media_query = select(Media.tmdbid).where(
+                            Media.tmdbid.in_(search_tmdb_ids),
+                            Media.mtype == mtype,
+                            Media.tmdbid.is_not(None)
+                        )
+                        existing_media_results = session.exec(existing_media_query).all()
+                        
+                        print(f"DEBUG: Raw existing media results: {existing_media_results}")
+                        
+                        # Create set of existing TMDB IDs for quick lookup
+                        existing_tmdb_ids = set()
+                        for tmdb_id in existing_media_results:
+                            if tmdb_id is not None:
+                                existing_tmdb_ids.add(int(tmdb_id))
+                        
+                        print(f"DEBUG: Final existing TMDB IDs set: {existing_tmdb_ids}")
+                        
+                        # Check each result item
+                        for item in results[:3]:  # Just first 3 for debugging
+                            item_id = int(item.get("id", 0))
+                            title = item.get("title") or item.get("name", "Unknown")
+                            print(f"DEBUG: Checking item '{title}' with TMDB ID {item_id}: {'EXISTS' if item_id in existing_tmdb_ids else 'NEW'}")
     
     context = get_base_context(request)
     context.update({
@@ -204,7 +252,8 @@ async def tmdb_search(
         "results": results,
         "total_results": total_results,
         "total_pages": total_pages,
-        "current_page": current_page
+        "current_page": current_page,
+        "existing_tmdb_ids": existing_tmdb_ids
     })
     
     return templates.TemplateResponse("tmdb_search.html", context)

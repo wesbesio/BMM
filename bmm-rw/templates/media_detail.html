@@ -29,14 +29,12 @@
         </div>
         
         <a href="/media/{{ media.id }}/edit" class="btn btn-warning">Edit</a>
-        <button class="btn btn-danger"
-                hx-post="/media/{{ media.id }}/delete"
-                hx-confirm="Are you sure you want to delete this media?"
-                hx-target="body"
-                hx-swap="outerHTML"
-                hx-push-url="/media/">
-            Delete
-        </button>
+        <form action="/media/{{ media.id }}/delete" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('Are you sure you want to delete this media?')">
+                Delete
+            </button>
+        </form>
     </div>
 </div>
 
