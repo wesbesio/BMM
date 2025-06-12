@@ -18,11 +18,12 @@ Both applications share the same SQLite database and provide different interface
 - **Internet**: Required for TMDB API integration (RW version)
 
 ### Required Knowledge
-- **HTMX Fundamentals**: Required for RW application maintenance
+- **HTMX Fundamentals**: Required for both RW and RO application maintenance
 - **📚 MANDATORY READING**: [HTMX Quirks & Best Practices](https://htmx.org/quirks/)
   - Essential for understanding dynamic UI components
   - Covers common pitfalls and implementation patterns
   - Required before modifying any HTMX-related code
+- **Mobile-First Design**: Both applications use responsive, touch-optimized interfaces
 
 ## 📝 Development Standards
 
@@ -50,6 +51,12 @@ Both applications share the same SQLite database and provide different interface
 ```python
 # File: bmm-rw/main.py
 # Revision: 1.42 - Main FastAPI application with TMDB search and CRUD operations
+```
+
+```python
+# File: bmm-ro/main.py  
+# Revision: 1.14 - Added HTMX support and mobile-first responsive UI
+# main.py (Read-Only Version) version 1.14
 ```
 
 ## 🚀 Quick Start
@@ -201,12 +208,16 @@ python main.py
 - ✅ Search and filtering
 - ✅ Pagination
 
-### BMM-RO (Read-Only Viewer) - Port 8001
-- ✅ View-only interface
-- ✅ Search and filtering
-- ✅ Pagination
-- ✅ Media and asset browsing
-- ✅ Clean, simplified UI
+### BMM-RO (Read-Only Viewer) - Port 8001 **[HTMX-OPTIMIZED v1.14]**
+- ✅ **HTMX-powered dynamic interface** with live search and filtering
+- ✅ **Mobile-first responsive design** with touch-optimized interactions
+- ✅ **Clickable records** - entire cards/rows navigate to details
+- ✅ **Real-time search** with 500ms debounce for instant results
+- ✅ **Smart pagination** with partial page updates
+- ✅ **Progressive layouts** - mobile cards → desktop tables
+- ✅ **44px minimum touch targets** for accessibility compliance
+- ✅ **Version display** in navigation (v1.14)
+- ✅ **Streamlined interface** - removed unnecessary UI elements
 - ❌ No create/edit/delete operations
 - ❌ No TMDB integration
 
@@ -225,12 +236,23 @@ project-root/
 │   │   ├── asset_list.html         # Asset listing
 │   │   └── partials/               # HTMX partial templates
 │   └── static/                     # CSS/JS assets
-├── bmm-ro/                          # Read-only application
-│   ├── main.py                      # Read-only FastAPI app
+├── bmm-ro/                          # Read-only application [HTMX-OPTIMIZED v1.14]
+│   ├── main.py                      # Read-only FastAPI app with HTMX support
 │   ├── requirements.txt             # Python dependencies
-│   ├── .env                         # Environment variables
-│   ├── templates-readonly/          # Read-only templates
-│   └── static/                     # CSS/JS assets
+│   ├── templates-readonly/          # HTMX-optimized read-only templates
+│   │   ├── base.html               # HTMX integration + mobile-first CSS
+│   │   ├── home.html               # Streamlined dashboard (no hero/features)
+│   │   ├── asset_list.html         # HTMX-powered asset browsing
+│   │   ├── media_list.html         # HTMX-powered media browsing  
+│   │   ├── asset_detail.html       # Mobile-optimized detail view
+│   │   ├── media_detail.html       # Mobile-optimized detail view
+│   │   └── partials/               # HTMX partial templates
+│   │       ├── asset_list_content.html  # Dynamic asset list updates
+│   │       └── media_list_content.html  # Dynamic media list updates
+│   └── static/                     # Enhanced CSS/JS assets
+│       ├── css/
+│       │   └── custom.css          # Mobile-first CSS with HTMX styles
+│       └── js/                     # Minimal JavaScript for mobile
 └── media_assets.db                  # Shared SQLite database
 ```
 
@@ -262,6 +284,8 @@ project-root/
 2. **Update file headers** with new revision numbers
 3. **Test both applications** after changes
 4. **Verify database compatibility** between RW and RO versions
+5. **Test mobile responsiveness** on various device sizes
+6. **Verify clickable record functionality** in both mobile and desktop views
 
 ## 🧪 Testing the Setup
 
@@ -288,6 +312,25 @@ ls -la media_assets.db
 2. Search for a movie or TV show
 3. Verify results appear with poster images
 4. Test creating media from TMDB result
+
+### 4. Test HTMX Mobile Optimization (RO Application)
+1. Navigate to http://localhost:8001/
+2. **Mobile Testing**:
+   - Resize browser to mobile width (< 576px)
+   - Verify cards display with #f0f0f0 background
+   - Test clickable cards (no separate buttons)
+   - Test live search with 500ms debounce
+   - Verify touch targets are 44px minimum
+3. **Desktop Testing**:
+   - Resize browser to desktop width (> 992px)
+   - Verify table layout appears
+   - Test clickable table rows
+   - Test pagination without page reloads
+4. **HTMX Functionality**:
+   - Test search without page refresh
+   - Test pagination with partial updates
+   - Test status filtering on media list
+   - Verify loading indicators appear during requests
 
 ## 🚨 Troubleshooting
 
@@ -325,8 +368,20 @@ pip install -r requirements.txt --force-reinstall
 
 **5. HTMX Not Loading**
 - Check browser console for JavaScript errors
-- Verify HTMX CDN is accessible
+- Verify HTMX CDN is accessible  
 - Review [HTMX Quirks documentation](https://htmx.org/quirks/)
+
+**6. Mobile Layout Issues**
+- Verify viewport meta tag is present in base.html
+- Check custom.css is loading properly
+- Test on different screen sizes (mobile, tablet, desktop)
+- Ensure touch targets meet 44px minimum requirement
+
+**7. Clickable Records Not Working**
+- Verify JavaScript is enabled in browser
+- Check for CSS conflicts with clickable-card/clickable-row classes
+- Test both mobile cards and desktop table rows
+- Ensure onclick handlers are properly escaped in templates
 
 ### Database Issues
 
@@ -374,15 +429,35 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8001
 
 ## ✅ Success Checklist
 
+### Basic Setup
 - [ ] Virtual environment activated
 - [ ] Dependencies installed for required applications
-- [ ] `.env` file created with valid TMDB API key
+- [ ] `.env` file created with valid TMDB API key (RW only)
 - [ ] Applications start without errors
 - [ ] Database file created automatically
 - [ ] Web interfaces accessible at correct ports
-- [ ] TMDB search functionality working (RW only)
+
+### RW Application (Port 8000)
+- [ ] TMDB search functionality working
+- [ ] HTMX dynamic UI functioning properly
+- [ ] CRUD operations working
+
+### RO Application (Port 8001) - HTMX Mobile Optimization
+- [ ] **Version v1.14 displayed** in navigation
+- [ ] **Mobile cards** display with #f0f0f0 background
+- [ ] **Clickable records** work (no separate action buttons)
+- [ ] **Live search** with 500ms debounce functioning
+- [ ] **HTMX pagination** works without page reloads
+- [ ] **Responsive layout** - mobile cards → desktop tables
+- [ ] **Touch targets** are 44px minimum
+- [ ] **Loading indicators** appear during HTMX requests
+- [ ] **Status filtering** works on media list
+- [ ] **Asset detail page** displays properly (no empty template)
+
+### Development Standards
 - [ ] File headers added to any new/modified files
 - [ ] HTMX quirks documentation reviewed
+- [ ] Mobile responsiveness tested on various screen sizes
 
 ---
 

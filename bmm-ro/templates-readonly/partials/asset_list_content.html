@@ -1,0 +1,168 @@
+<!-- File: bmm-ro/templates-readonly/partials/asset_list_content.html -->
+<!-- Revision: 1.0 - HTMX partial template for asset list dynamic content -->
+
+<div id="asset-content-container">
+    <!-- Mobile-first responsive layout for assets -->
+    
+    <!-- Mobile card layout (hidden on larger screens) -->
+    <div class="d-block d-lg-none">
+        {% for asset in assets %}
+        <a href="/assets/{{ asset.id }}" class="text-decoration-none">
+            <div class="card mb-3 asset-card clickable-card">
+                <div class="card-body">
+                    <h6 class="card-title mb-2 text-dark">{{ asset.title or "Untitled" }}</h6>
+                    <div class="row">
+                        <div class="col-4">
+                            <small class="text-muted">Format:</small><br>
+                            <span class="fw-medium text-dark">{{ asset.format or "N/A" }}</span>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">Type:</small><br>
+                            <span class="fw-medium text-dark">
+                                {% if asset.mtype == 1 %}
+                                    Movie
+                                {% elif asset.mtype == 2 %}
+                                    TV
+                                {% else %}
+                                    {{ asset.mtype or "N/A" }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">Location:</small><br>
+                            <span class="fw-medium text-dark">{{ asset.location or "N/A" }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-end">
+                        <i class="bi bi-arrow-right-circle text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Desktop table layout (visible on large screens) -->
+    <div class="d-none d-lg-block">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Format</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr class="clickable-row" onclick="window.location.href='/assets/{{ asset.id }}'" style="cursor: pointer;">
+                        <td>{{ asset.title or "Untitled" }}</td>
+                        <td>{{ asset.format or "N/A" }}</td>
+                        <td>
+                            {% if asset.mtype == 1 %}
+                                Movie
+                            {% elif asset.mtype == 2 %}
+                                TV
+                            {% else %}
+                                {{ asset.mtype or "N/A" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ asset.location or "N/A" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty state -->
+    {% if not assets %}
+    <div class="text-center py-5">
+        <i class="bi bi-collection-fill text-muted" style="font-size: 3rem;"></i>
+        <h3 class="text-muted mt-3">No assets found</h3>
+        <p class="text-muted">
+            {% if search %}
+                No assets match your search criteria.
+            {% else %}
+                No assets have been added yet.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Mobile-optimized pagination -->
+    {% if pagination.total_pages > 1 %}
+    <nav aria-label="Asset list pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <!-- Previous button -->
+            <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link" 
+                   hx-get="/assets/?page={{ pagination.page - 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}"
+                   hx-target="#asset-content-container"
+                   hx-include="[name='search'], [name='per_page']">
+                    <i class="bi bi-chevron-left"></i>
+                    <span class="d-none d-sm-inline">Previous</span>
+                </a>
+            </li>
+            
+            <!-- Simplified page numbers for mobile -->
+            <li class="page-item active">
+                <span class="page-link">{{ pagination.page }} of {{ pagination.total_pages }}</span>
+            </li>
+            
+            <!-- Next button -->
+            <li class="page-item {% if pagination.page == pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                   hx-get="/assets/?page={{ pagination.page + 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}"
+                   hx-target="#asset-content-container"
+                   hx-include="[name='search'], [name='per_page']">
+                    <span class="d-none d-sm-inline">Next</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Desktop-style pagination (hidden on mobile) -->
+        <ul class="pagination justify-content-center d-none d-md-flex">
+            <!-- Previous button -->
+            <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link" 
+                   hx-get="/assets/?page={{ pagination.page - 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}"
+                   hx-target="#asset-content-container"
+                   hx-include="[name='search'], [name='per_page']">
+                    Previous
+                </a>
+            </li>
+            
+            <!-- Page numbers -->
+            {% set start_page = [1, pagination.page - 2]|max %}
+            {% set end_page = [pagination.total_pages, start_page + 4]|min %}
+            {% if end_page - start_page < 4 %}
+                {% set start_page = [1, end_page - 4]|max %}
+            {% endif %}
+            
+            {% for p in range(start_page, end_page + 1) %}
+            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                <a class="page-link" 
+                   hx-get="/assets/?page={{ p }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}"
+                   hx-target="#asset-content-container"
+                   hx-include="[name='search'], [name='per_page']">
+                    {{ p }}
+                </a>
+            </li>
+            {% endfor %}
+            
+            <!-- Next button -->
+            <li class="page-item {% if pagination.page == pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                   hx-get="/assets/?page={{ pagination.page + 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}"
+                   hx-target="#asset-content-container"
+                   hx-include="[name='search'], [name='per_page']">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
