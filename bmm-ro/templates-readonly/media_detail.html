@@ -1,163 +1,368 @@
-<!-- templates-readonly/media_detail.html -->
+<!-- File: bmm-ro/templates-readonly/media_detail.html -->
+<!-- Revision: 2.0 - Mobile-first responsive media detail view -->
 {% extends "base.html" %}
 
+{% block title %}{{ media.title or "Media" }} - Media Details{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/media/">Media Collection</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ media.title or "Media #" + media.id|string }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<!-- Page Header with Navigation -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
     <div>
-        <h1>Media Details</h1>
+        <h1 class="h3 mb-1">
+            {% if media.mtype == 1 %}
+                <i class="bi bi-film text-primary me-2" aria-hidden="true"></i>
+            {% elif media.mtype == 2 %}
+                <i class="bi bi-tv text-info me-2" aria-hidden="true"></i>
+            {% else %}
+                <i class="bi bi-camera-reels text-secondary me-2" aria-hidden="true"></i>
+            {% endif %}
+            {{ media.title or "Untitled Media" }}
+        </h1>
+        {% if media.subtitle %}
+        <p class="text-muted mb-0">{{ media.subtitle }}</p>
+        {% endif %}
     </div>
-    <div>
-        <div class="btn-group">
-            {% if prev_id %}
-            <a href="/media/{{ prev_id }}" class="btn btn-outline-primary">
-                <i class="bi bi-chevron-left"></i> Previous
-            </a>
-            {% else %}
-            <button class="btn btn-outline-primary" disabled>
-                <i class="bi bi-chevron-left"></i> Previous
-            </button>
-            {% endif %}
-            
-            {% if next_id %}
-            <a href="/media/{{ next_id }}" class="btn btn-outline-primary">
-                Next <i class="bi bi-chevron-right"></i>
-            </a>
-            {% else %}
-            <button class="btn btn-outline-primary" disabled>
-                Next <i class="bi bi-chevron-right"></i>
-            </button>
-            {% endif %}
-        </div>
+    
+    <!-- Navigation Controls -->
+    <div class="btn-group w-100 w-md-auto" role="group" aria-label="Media navigation">
+        {% if prev_id %}
+        <a href="/media/{{ prev_id }}" class="btn btn-outline-primary">
+            <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
+            <span class="d-none d-sm-inline">Previous</span>
+        </a>
+        {% else %}
+        <button class="btn btn-outline-secondary" disabled>
+            <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
+            <span class="d-none d-sm-inline">Previous</span>
+        </button>
+        {% endif %}
+        
+        <a href="/media/" class="btn btn-outline-primary">
+            <i class="bi bi-list me-1" aria-hidden="true"></i>
+            <span class="d-none d-sm-inline">Back to List</span>
+        </a>
+        
+        {% if next_id %}
+        <a href="/media/{{ next_id }}" class="btn btn-outline-primary">
+            <span class="d-none d-sm-inline">Next</span>
+            <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
+        </a>
+        {% else %}
+        <button class="btn btn-outline-secondary" disabled>
+            <span class="d-none d-sm-inline">Next</span>
+            <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
+        </button>
+        {% endif %}
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header bg-primary text-white">
-        <h5 class="card-title mb-0">{{ media.title }}</h5>
-        {% if media.subtitle %}
-        <h6 class="card-subtitle mt-1">{{ media.subtitle }}</h6>
-        {% endif %}
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                {% if media.imageurl %}
-                <img src="{{ media.imageurl }}" alt="{{ media.title }}" class="img-fluid mb-3">
-                {% endif %}
-                
-                <h6>Basic Information</h6>
-                <table class="table">
-                    <tr>
-                        <th>ID</th>
-                        <td>{{ media.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Title</th>
-                        <td>{{ media.title }}</td>
-                    </tr>
-                    <tr>
-                        <th>Subtitle</th>
-                        <td>{{ media.subtitle }}</td>
-                    </tr>
-                    <tr>
-                        <th>Media Type</th>
-                        <td>
-                            {% if media.mtype == 1 %}
-                                Movie
-                            {% elif media.mtype == 2 %}
-                                TV
-                            {% else %}
-                                {{ media.mtype }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Creation Date</th>
-                        <td>{{ media.creation.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    </tr>
-                </table>
+<!-- Media Details Card -->
+<div class="row g-4 mb-4">
+    <!-- Media Poster/Image -->
+    {% if media.imageurl %}
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="position-relative">
+                <img src="{{ media.imageurl }}" alt="{{ media.title or 'Media' }} poster" 
+                     class="card-img-top" style="height: 400px; object-fit: cover;">
+                <div class="position-absolute top-0 end-0 m-3">
+                    {% if media.mtype == 1 %}
+                    <span class="badge bg-primary">
+                        <i class="bi bi-film me-1" aria-hidden="true"></i>
+                        Movie
+                    </span>
+                    {% elif media.mtype == 2 %}
+                    <span class="badge bg-info">
+                        <i class="bi bi-tv me-1" aria-hidden="true"></i>
+                        TV Show
+                    </span>
+                    {% endif %}
+                </div>
             </div>
-            
-            <div class="col-md-6">
-                <h6>Additional Details</h6>
-                <table class="table">
-                    <tr>
-                        <th>IMDB ID</th>
-                        <td>{{ media.imdbid }}</td>
-                    </tr>
-                    <tr>
-                        <th>TMDB ID</th>
-                        <td>{{ media.tmdbid }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>
-                            {% if media.active %}
-                            <span class="badge bg-success">Active</span>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Media Information -->
+    <div class="{% if media.imageurl %}col-lg-8{% else %}col-12{% endif %}">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+                        Media Information
+                    </h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if media.active %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1" aria-hidden="true"></i>
+                            Active
+                        </span>
+                        {% else %}
+                        <span class="badge bg-danger">
+                            <i class="bi bi-x-circle me-1" aria-hidden="true"></i>
+                            Inactive
+                        </span>
+                        {% endif %}
+                        
+                        {% if media.flag %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-flag me-1" aria-hidden="true"></i>
+                            Flagged
+                        </span>
+                        {% endif %}
+                        
+                        {% if media.acquire %}
+                        <span class="badge bg-info">
+                            <i class="bi bi-download me-1" aria-hidden="true"></i>
+                            To Acquire
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Title</label>
+                        <p class="mb-0">{{ media.title or "Not specified" }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Media ID</label>
+                        <p class="mb-0">
+                            <span class="badge bg-secondary">{{ media.id }}</span>
+                        </p>
+                    </div>
+                    
+                    {% if media.subtitle %}
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Subtitle</label>
+                        <p class="mb-0">{{ media.subtitle }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Media Type</label>
+                        <p class="mb-0">
+                            {% if media.mtype == 1 %}
+                                <i class="bi bi-film me-1 text-primary" aria-hidden="true"></i>Movie
+                            {% elif media.mtype == 2 %}
+                                <i class="bi bi-tv me-1 text-info" aria-hidden="true"></i>TV Show
+                            {% elif media.mtype %}
+                                <i class="bi bi-question-circle me-1" aria-hidden="true"></i>{{ media.mtype }}
                             {% else %}
-                            <span class="badge bg-danger">Inactive</span>
+                                <span class="text-muted">Not specified</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Creation Date</label>
+                        <p class="mb-0">
+                            <i class="bi bi-calendar me-1 text-muted" aria-hidden="true"></i>
+                            {{ media.creation.strftime('%B %d, %Y') }}
+                            <small class="text-muted d-block">{{ media.creation.strftime('%I:%M %p') }}</small>
+                        </p>
+                    </div>
+                    
+                    <!-- External IDs -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">External IDs</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if media.imdbid %}
+                            <a href="https://www.imdb.com/title/{{ media.imdbid }}" 
+                               target="_blank" rel="noopener noreferrer" 
+                               class="text-decoration-none">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-link-45deg me-1" aria-hidden="true"></i>
+                                    IMDB: {{ media.imdbid }}
+                                </span>
+                            </a>
                             {% endif %}
                             
-                            {% if media.flag %}
-                            <span class="badge bg-warning text-dark">Flagged</span>
+                            {% if media.tmdbid %}
+                            <a href="https://www.themoviedb.org/{% if media.mtype == 1 %}movie{% elif media.mtype == 2 %}tv{% else %}search?query={% endif %}/{{ media.tmdbid }}" 
+                               target="_blank" rel="noopener noreferrer" 
+                               class="text-decoration-none">
+                                <span class="badge bg-primary">
+                                    <i class="bi bi-link-45deg me-1" aria-hidden="true"></i>
+                                    TMDB: {{ media.tmdbid }}
+                                </span>
+                            </a>
                             {% endif %}
                             
-                            {% if media.acquire %}
-                            <span class="badge bg-info text-dark">To Acquire</span>
+                            {% if not media.imdbid and not media.tmdbid %}
+                            <span class="text-muted">No external IDs available</span>
                             {% endif %}
-                        </td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                </div>
                 
                 {% if media.notes %}
-                <div class="card mb-3">
-                    <div class="card-header">Notes</div>
-                    <div class="card-body">
-                        <p class="card-text">{{ media.notes }}</p>
+                <div class="mt-4">
+                    <div class="card bg-light border-0">
+                        <div class="card-header bg-transparent border-0 pb-2">
+                            <h6 class="mb-0">
+                                <i class="bi bi-sticky me-2" aria-hidden="true"></i>
+                                Notes
+                            </h6>
+                        </div>
+                        <div class="card-body pt-0">
+                            <p class="mb-0 text-break">{{ media.notes }}</p>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
             </div>
         </div>
-        
-        <h5 class="mt-4">Associated Assets</h5>
+    </div>
+</div>
+
+<!-- Associated Assets Section -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-link me-2" aria-hidden="true"></i>
+            Associated Assets
+            {% if media.assets %}
+            <span class="badge bg-primary ms-2">{{ media.assets|length }}</span>
+            {% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
         {% if media.assets %}
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Format</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for asset in media.assets %}
-                    <tr>
-                        <td>{{ asset.id }}</td>
-                        <td>{{ asset.title }}</td>
-                        <td>{{ asset.format }}</td>
-                        <td>{{ asset.location }}</td>
-                        <td>
-                            {% if asset.active %}
-                            <span class="badge bg-success">Active</span>
-                            {% else %}
-                            <span class="badge bg-danger">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="/assets/{{ asset.id }}" class="btn btn-sm btn-info">View</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Mobile Card View -->
+        <div class="d-lg-none">
+            <div class="row g-3">
+                {% for asset in media.assets %}
+                <div class="col-12">
+                    <div class="card border">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0 text-truncate me-2">
+                                    {{ asset.title or "Untitled Asset" }}
+                                </h6>
+                                <span class="badge bg-secondary text-nowrap">ID: {{ asset.id }}</span>
+                            </div>
+                            
+                            <div class="row g-2 small text-muted mb-3">
+                                <div class="col-6">
+                                    <strong>Format:</strong><br>
+                                    {{ asset.format or "Not specified" }}
+                                </div>
+                                <div class="col-6">
+                                    <strong>Status:</strong><br>
+                                    {% if asset.active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </div>
+                                {% if asset.location %}
+                                <div class="col-12">
+                                    <strong>Location:</strong><br>
+                                    <span class="text-break font-monospace small">{{ asset.location }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-1">
+                                    {% if asset.dupe %}
+                                    <span class="badge bg-warning text-dark">Duplicate</span>
+                                    {% endif %}
+                                    {% if asset.flag %}
+                                    <span class="badge bg-danger">Flagged</span>
+                                    {% endif %}
+                                </div>
+                                <a href="/assets/{{ asset.id }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye me-1" aria-hidden="true"></i>
+                                    View Asset
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Desktop Table View -->
+        <div class="d-none d-lg-block">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Format</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in media.assets %}
+                        <tr>
+                            <td class="fw-bold">{{ asset.id }}</td>
+                            <td class="text-truncate" style="max-width: 200px;">
+                                {{ asset.title or "Untitled Asset" }}
+                            </td>
+                            <td>
+                                {% if asset.format %}
+                                <span class="badge bg-light text-dark">{{ asset.format }}</span>
+                                {% else %}
+                                <span class="text-muted">Unknown</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-truncate font-monospace small" style="max-width: 250px;">
+                                {{ asset.location or "Not specified" }}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    {% if asset.active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                    {% if asset.dupe %}
+                                    <span class="badge bg-warning text-dark">Dupe</span>
+                                    {% endif %}
+                                    {% if asset.flag %}
+                                    <span class="badge bg-danger">Flag</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a href="/assets/{{ asset.id }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye me-1" aria-hidden="true"></i>
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% else %}
-        <p>No assets associated with this media.</p>
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-link" aria-hidden="true"></i>
+            </div>
+            <h5>No Associated Assets</h5>
+            <p class="text-muted">This media item is not currently linked to any physical assets.</p>
+        </div>
         {% endif %}
     </div>
 </div>

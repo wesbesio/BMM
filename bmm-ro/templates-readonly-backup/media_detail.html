@@ -1,0 +1,164 @@
+<!-- templates-readonly/media_detail.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>Media Details</h1>
+    </div>
+    <div>
+        <div class="btn-group">
+            {% if prev_id %}
+            <a href="/media/{{ prev_id }}" class="btn btn-outline-primary">
+                <i class="bi bi-chevron-left"></i> Previous
+            </a>
+            {% else %}
+            <button class="btn btn-outline-primary" disabled>
+                <i class="bi bi-chevron-left"></i> Previous
+            </button>
+            {% endif %}
+            
+            {% if next_id %}
+            <a href="/media/{{ next_id }}" class="btn btn-outline-primary">
+                Next <i class="bi bi-chevron-right"></i>
+            </a>
+            {% else %}
+            <button class="btn btn-outline-primary" disabled>
+                Next <i class="bi bi-chevron-right"></i>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">{{ media.title }}</h5>
+        {% if media.subtitle %}
+        <h6 class="card-subtitle mt-1">{{ media.subtitle }}</h6>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {% if media.imageurl %}
+                <img src="{{ media.imageurl }}" alt="{{ media.title }}" class="img-fluid mb-3">
+                {% endif %}
+                
+                <h6>Basic Information</h6>
+                <table class="table">
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ media.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Title</th>
+                        <td>{{ media.title }}</td>
+                    </tr>
+                    <tr>
+                        <th>Subtitle</th>
+                        <td>{{ media.subtitle }}</td>
+                    </tr>
+                    <tr>
+                        <th>Media Type</th>
+                        <td>
+                            {% if media.mtype == 1 %}
+                                Movie
+                            {% elif media.mtype == 2 %}
+                                TV
+                            {% else %}
+                                {{ media.mtype }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Creation Date</th>
+                        <td>{{ media.creation.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h6>Additional Details</h6>
+                <table class="table">
+                    <tr>
+                        <th>IMDB ID</th>
+                        <td>{{ media.imdbid }}</td>
+                    </tr>
+                    <tr>
+                        <th>TMDB ID</th>
+                        <td>{{ media.tmdbid }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            {% if media.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                            
+                            {% if media.flag %}
+                            <span class="badge bg-warning text-dark">Flagged</span>
+                            {% endif %}
+                            
+                            {% if media.acquire %}
+                            <span class="badge bg-info text-dark">To Acquire</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                
+                {% if media.notes %}
+                <div class="card mb-3">
+                    <div class="card-header">Notes</div>
+                    <div class="card-body">
+                        <p class="card-text">{{ media.notes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <h5 class="mt-4">Associated Assets</h5>
+        {% if media.assets %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Format</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in media.assets %}
+                    <tr>
+                        <td>{{ asset.id }}</td>
+                        <td>{{ asset.title }}</td>
+                        <td>{{ asset.format }}</td>
+                        <td>{{ asset.location }}</td>
+                        <td>
+                            {% if asset.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/assets/{{ asset.id }}" class="btn btn-sm btn-info">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No assets associated with this media.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

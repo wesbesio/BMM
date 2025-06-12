@@ -1,31 +1,136 @@
-<!-- templates-readonly/home.html -->
+<!-- File: bmm-ro/templates-readonly/home.html -->
+<!-- Revision: 2.0 - Mobile-first responsive dashboard design -->
 {% extends "base.html" %}
 
+{% block title %}Dashboard - Media Assets Viewer{% endblock %}
+
 {% block content %}
-<div class="jumbotron">
-    <h1 class="display-4">Welcome to Media Assets Viewer</h1>
-    <p class="lead">View your media collection and assets. This is a read-only version of the application.</p>
-    <hr class="my-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Media Collection</h5>
+<!-- Hero Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="hero-section text-center py-4 py-md-5 bg-light rounded-3">
+            <h1 class="display-5 fw-bold text-primary mb-3">
+                <i class="bi bi-collection-play me-2" aria-hidden="true"></i>
+                Media Assets Dashboard
+            </h1>
+            <p class="lead text-muted mb-0">
+                Browse and explore your media collection in read-only mode
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Cards -->
+<div class="row g-3 g-md-4 mb-4">
+    <div class="col-sm-6">
+        <a href="/media/" class="dashboard-card media-card text-decoration-none">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="stat-icon text-info">
+                            <i class="bi bi-camera-reels fs-1" aria-hidden="true"></i>
+                        </div>
+                        <div class="text-end">
+                            <h2 class="display-6 fw-bold text-info mb-0">{{ media_count }}</h2>
+                            <small class="text-muted">Total Items</small>
+                        </div>
+                    </div>
+                    <h5 class="card-title mb-2">Media Collection</h5>
+                    <p class="card-text text-muted small mb-3">
+                        Browse movies, TV shows, and other media content
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center text-info">
+                        <span class="me-2">Explore Media</span>
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">There are <strong>{{ media_count }}</strong> media items in the collection.</p>
-                    <a href="/media/" class="btn btn-primary">View Media</a>
+            </div>
+        </a>
+    </div>
+    
+    <div class="col-sm-6">
+        <a href="/assets/" class="dashboard-card assets-card text-decoration-none">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="stat-icon text-success">
+                            <i class="bi bi-folder fs-1" aria-hidden="true"></i>
+                        </div>
+                        <div class="text-end">
+                            <h2 class="display-6 fw-bold text-success mb-0">{{ asset_count }}</h2>
+                            <small class="text-muted">Total Files</small>
+                        </div>
+                    </div>
+                    <h5 class="card-title mb-2">Physical Assets</h5>
+                    <p class="card-text text-muted small mb-3">
+                        View file locations, formats, and metadata
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center text-success">
+                        <span class="me-2">Browse Assets</span>
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2" aria-hidden="true"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 g-md-3">
+                    <div class="col-6 col-md-3">
+                        <a href="/media/" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                            <i class="bi bi-search fs-4 mb-2" aria-hidden="true"></i>
+                            <span class="small">Search Media</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="/assets/" class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                            <i class="bi bi-filter fs-4 mb-2" aria-hidden="true"></i>
+                            <span class="small">Browse Assets</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="/media/?status=active" class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                            <i class="bi bi-check-circle fs-4 mb-2" aria-hidden="true"></i>
+                            <span class="small">Active Media</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="/media/?status=acquire" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                            <i class="bi bi-download fs-4 mb-2" aria-hidden="true"></i>
+                            <span class="small">To Acquire</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="card-title mb-0">Assets</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">There are <strong>{{ asset_count }}</strong> assets in the collection.</p>
-                    <a href="/assets/" class="btn btn-secondary">View Assets</a>
+    </div>
+</div>
+
+<!-- System Info (visible on larger screens) -->
+<div class="row d-none d-md-block">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body">
+                <div class="row align-items-center text-muted small">
+                    <div class="col-md-6">
+                        <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
+                        Read-Only Mode Active - Safe browsing enabled
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <i class="bi bi-server me-1" aria-hidden="true"></i>
+                        BMM System {{ app_version }}
+                    </div>
                 </div>
             </div>
         </div>

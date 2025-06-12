@@ -1,4 +1,5 @@
-# main.py (Read-Only Version) version 1.12
+# File: bmm-ro/main.py
+# Revision: 1.13 - Added mobile-first responsive UI support
 #  
 from fastapi import FastAPI, Request, Depends, Query, HTTPException, Header
 from fastapi.responses import HTMLResponse
