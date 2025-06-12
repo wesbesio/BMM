@@ -1,4 +1,6 @@
-# main.py (Read-Only Version) version 1.12
+# main.py (Read-Only Version) version 1.14
+# File: bmm-ro/main.py
+# Revision: 1.14 - Added HTMX support and mobile-first responsive UI
 #  
 from fastapi import FastAPI, Request, Depends, Query, HTTPException, Header
 from fastapi.responses import HTMLResponse
@@ -96,6 +98,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Get version once at startup
 APP_VERSION = get_version()
 
+def is_htmx_request(request: Request) -> bool:
+    """Check if request is from HTMX"""
+    return request.headers.get("HX-Request") == "true"
+
 def get_base_context(request: Request) -> dict:
     """Get base template context with version info"""
     return {"request": request, "app_version": APP_VERSION}
@@ -152,6 +158,11 @@ async def list_assets(
         }
     })
     
+    # Return partial template for HTMX requests
+    if is_htmx_request(request):
+        return templates.TemplateResponse("partials/asset_list_content.html", context)
+    
+    # Otherwise return the full page
     return templates.TemplateResponse("asset_list.html", context)
 
 @app.get("/assets/{asset_id}", response_class=HTMLResponse)
@@ -245,6 +256,11 @@ async def list_media(
         }
     })
     
+    # Return partial template for HTMX requests
+    if is_htmx_request(request):
+        return templates.TemplateResponse("partials/media_list_content.html", context)
+    
+    # Otherwise return the full page
     return templates.TemplateResponse("media_list.html", context)
 
 @app.get("/media/{media_id}", response_class=HTMLResponse)

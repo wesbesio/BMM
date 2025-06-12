@@ -1,0 +1,301 @@
+<!-- File: bmm-ro/templates-readonly/asset_detail.html -->
+<!-- Revision: 1.14 - Mobile-first responsive asset detail view -->
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Mobile-first header with navigation -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">
+            <i class="bi bi-collection"></i> Asset Details
+        </h1>
+    </div>
+    <div>
+        <div class="btn-group" role="group">
+            {% if prev_id %}
+            <a href="/assets/{{ prev_id }}" class="btn btn-outline-primary">
+                <i class="bi bi-chevron-left"></i>
+                <span class="d-none d-sm-inline">Previous</span>
+            </a>
+            {% else %}
+            <button class="btn btn-outline-primary" disabled>
+                <i class="bi bi-chevron-left"></i>
+                <span class="d-none d-sm-inline">Previous</span>
+            </button>
+            {% endif %}
+            
+            {% if next_id %}
+            <a href="/assets/{{ next_id }}" class="btn btn-outline-primary">
+                <span class="d-none d-sm-inline">Next</span>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% else %}
+            <button class="btn btn-outline-primary" disabled>
+                <span class="d-none d-sm-inline">Next</span>
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mobile-first asset detail card -->
+<div class="card shadow-sm">
+    <div class="card-header bg-gradient text-white d-flex align-items-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <i class="bi bi-collection-fill fs-4 me-3"></i>
+        <div class="flex-fill">
+            <h5 class="card-title mb-0">{{ asset.title or "Untitled Asset" }}</h5>
+            {% if asset.subtitle %}
+            <h6 class="card-subtitle mt-1 opacity-75">{{ asset.subtitle }}</h6>
+            {% endif %}
+        </div>
+        <div class="d-flex gap-2">
+            {% if asset.active %}
+            <span class="badge bg-light text-dark">Active</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">Inactive</span>
+            {% endif %}
+            
+            {% if asset.flag %}
+            <span class="badge bg-danger">Flagged</span>
+            {% endif %}
+            
+            {% if asset.dupe %}
+            <span class="badge bg-info">Duplicate</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card-body">
+        <div class="row g-4">
+            <!-- Left column - Image and basic info -->
+            <div class="col-12 col-lg-6">
+                {% if asset.imageurl %}
+                <div class="text-center mb-4">
+                    <img src="{{ asset.imageurl }}" alt="{{ asset.title or 'Asset image' }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                </div>
+                {% elif asset.image %}
+                <div class="text-center mb-4">
+                    <img src="{{ asset.image }}" alt="{{ asset.title or 'Asset image' }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                </div>
+                {% endif %}
+                
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="bi bi-info-circle"></i> Basic Information
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width: 35%;">Title</th>
+                                <td>{{ asset.title or "No title specified" }}</td>
+                            </tr>
+                            {% if asset.subtitle %}
+                            <tr>
+                                <th class="text-muted">Subtitle</th>
+                                <td>{{ asset.subtitle }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th class="text-muted">Format</th>
+                                <td>
+                                    {% if asset.format %}
+                                        <span class="badge bg-secondary">{{ asset.format }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Media Type</th>
+                                <td>
+                                    {% if asset.mtype == 1 %}
+                                        <i class="bi bi-film text-primary"></i> Movie
+                                    {% elif asset.mtype == 2 %}
+                                        <i class="bi bi-tv text-info"></i> TV Show
+                                    {% elif asset.mtype %}
+                                        <span class="badge bg-warning text-dark">{{ asset.mtype }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Creation Date</th>
+                                <td>
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ asset.creation.strftime('%B %d, %Y at %I:%M %p') }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Right column - Additional details -->
+            <div class="col-12 col-lg-6">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="bi bi-gear"></i> Additional Details
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width: 35%;">Location</th>
+                                <td>
+                                    {% if asset.location %}
+                                        <i class="bi bi-geo-alt"></i> {{ asset.location }}
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if asset.isbn %}
+                            <tr>
+                                <th class="text-muted">ISBN</th>
+                                <td><code>{{ asset.isbn }}</code></td>
+                            </tr>
+                            {% endif %}
+                            {% if asset.imdbid %}
+                            <tr>
+                                <th class="text-muted">IMDB ID</th>
+                                <td>
+                                    <a href="https://www.imdb.com/title/{{ asset.imdbid }}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-link-45deg"></i> {{ asset.imdbid }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if asset.tmdbid %}
+                            <tr>
+                                <th class="text-muted">TMDB ID</th>
+                                <td>
+                                    <a href="https://www.themoviedb.org/movie/{{ asset.tmdbid }}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-link-45deg"></i> {{ asset.tmdbid }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th class="text-muted">Status</th>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% if asset.active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                        
+                                        {% if asset.flag %}
+                                        <span class="badge bg-warning text-dark">Flagged</span>
+                                        {% endif %}
+                                        
+                                        {% if asset.dupe %}
+                                        <span class="badge bg-info text-dark">Duplicate</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if asset.notes %}
+                <div class="card mt-4 bg-light">
+                    <div class="card-header bg-transparent border-0">
+                        <h6 class="mb-0">
+                            <i class="bi bi-sticky"></i> Notes
+                        </h6>
+                    </div>
+                    <div class="card-body pt-0">
+                        <p class="card-text mb-0">{{ asset.notes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Associated Media section -->
+        <div class="mt-5">
+            <h5 class="border-bottom pb-2 mb-3">
+                <i class="bi bi-collection-play"></i> Associated Media
+            </h5>
+            {% if asset.media %}
+                <!-- Mobile card layout -->
+                <div class="d-block d-lg-none">
+                    {% for media in asset.media %}
+                    <a href="/media/{{ media.id }}" class="text-decoration-none">
+                        <div class="card mb-3 media-card clickable-card">
+                            <div class="card-body">
+                                <h6 class="card-title mb-2 text-dark">{{ media.title or "Untitled Media" }}</h6>
+                                <p class="text-muted mb-2">
+                                    {% if media.mtype == 1 %}
+                                        <i class="bi bi-film"></i> Movie
+                                    {% elif media.mtype == 2 %}
+                                        <i class="bi bi-tv"></i> TV Show
+                                    {% else %}
+                                        Type: {{ media.mtype or "Unknown" }}
+                                    {% endif %}
+                                </p>
+                                <div class="text-end">
+                                    <i class="bi bi-arrow-right-circle text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                <!-- Desktop table layout -->
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for media in asset.media %}
+                                <tr class="clickable-row" onclick="window.location.href='/media/{{ media.id }}'" style="cursor: pointer;">
+                                    <td><span class="badge bg-primary">{{ media.id }}</span></td>
+                                    <td>{{ media.title or "Untitled Media" }}</td>
+                                    <td>
+                                        {% if media.mtype == 1 %}
+                                            <i class="bi bi-film"></i> Movie
+                                        {% elif media.mtype == 2 %}
+                                            <i class="bi bi-tv"></i> TV Show
+                                        {% else %}
+                                            {{ media.mtype or "Unknown" }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-collection-play" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <p class="mt-2 mb-0">No media items associated with this asset.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Card footer with quick actions -->
+    <div class="card-footer bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/assets/" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Assets
+            </a>
+            <div class="text-muted small">
+                Last updated: {{ asset.creation.strftime('%m/%d/%Y') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

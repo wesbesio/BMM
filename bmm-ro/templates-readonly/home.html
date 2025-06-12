@@ -1,34 +1,72 @@
-<!-- templates-readonly/home.html -->
+<!-- File: bmm-ro/templates-readonly/home.html -->
+<!-- Revision: 1.14 - Updated with mobile-first responsive design -->
 {% extends "base.html" %}
 
 {% block content %}
-<div class="jumbotron">
-    <h1 class="display-4">Welcome to Media Assets Viewer</h1>
-    <p class="lead">View your media collection and assets. This is a read-only version of the application.</p>
-    <hr class="my-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+<!-- Mobile-first dashboard cards -->
+<div class="row g-4">
+    <!-- Media Collection Card -->
+    <div class="col-12 col-lg-6">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+            <div class="card-header bg-gradient text-white d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-collection-play-fill fs-4 me-3"></i>
+                <div>
                     <h5 class="card-title mb-0">Media Collection</h5>
+                    <small class="opacity-75">Movies & TV Shows</small>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">There are <strong>{{ media_count }}</strong> media items in the collection.</p>
-                    <a href="/media/" class="btn btn-primary">View Media</a>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="display-6 fw-bold text-primary mb-0">{{ media_count }}</div>
+                        <small class="text-muted">Total Items</small>
+                    </div>
+                    <i class="bi bi-collection-play text-primary opacity-25" style="font-size: 3rem;"></i>
+                </div>
+                <p class="card-text text-muted mb-4">
+                    Browse through your complete media collection with advanced search and filtering capabilities.
+                </p>
+                <div class="mt-auto">
+                    <a href="/media/" class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-arrow-right-circle me-2"></i>
+                        Browse Media
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="card-title mb-0">Assets</h5>
+    </div>
+    
+    <!-- Assets Card -->
+    <div class="col-12 col-lg-6">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+            <div class="card-header bg-gradient text-white d-flex align-items-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="bi bi-collection-fill fs-4 me-3"></i>
+                <div>
+                    <h5 class="card-title mb-0">Physical Assets</h5>
+                    <small class="opacity-75">DVDs, Blu-rays & Digital</small>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">There are <strong>{{ asset_count }}</strong> assets in the collection.</p>
-                    <a href="/assets/" class="btn btn-secondary">View Assets</a>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="display-6 fw-bold text-danger mb-0">{{ asset_count }}</div>
+                        <small class="text-muted">Total Assets</small>
+                    </div>
+                    <i class="bi bi-collection text-danger opacity-25" style="font-size: 3rem;"></i>
+                </div>
+                <p class="card-text text-muted mb-4">
+                    Explore your physical and digital asset collection with detailed location and format information.
+                </p>
+                <div class="mt-auto">
+                    <a href="/assets/" class="btn btn-outline-danger btn-lg w-100 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-arrow-right-circle me-2"></i>
+                        Browse Assets
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
 {% endblock %}

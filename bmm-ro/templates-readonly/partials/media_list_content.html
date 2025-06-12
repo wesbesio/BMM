@@ -1,0 +1,187 @@
+<!-- File: bmm-ro/templates-readonly/partials/media_list_content.html -->
+<!-- Revision: 1.0 - HTMX partial template for media list dynamic content -->
+
+<div id="media-content-container">
+    <!-- Mobile-first responsive layout for media -->
+    
+    <!-- Mobile card layout (hidden on larger screens) -->
+    <div class="d-block d-lg-none">
+        {% for media in media_items %}
+        <a href="/media/{{ media.id }}" class="text-decoration-none">
+            <div class="card mb-3 media-card clickable-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title mb-0 text-dark">{{ media.title or "Untitled" }}</h6>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% if media.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                            
+                            {% if media.flag %}
+                            <span class="badge bg-warning text-dark">Flagged</span>
+                            {% endif %}
+                            
+                            {% if media.acquire %}
+                            <span class="badge bg-info text-dark">To Acquire</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Type:</small>
+                        <span class="fw-medium text-dark">
+                            {% if media.mtype == 1 %}
+                                <i class="bi bi-film"></i> Movie
+                            {% elif media.mtype == 2 %}
+                                <i class="bi bi-tv"></i> TV Show
+                            {% else %}
+                                {{ media.mtype or "Unknown" }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="mt-2 text-end">
+                        <i class="bi bi-arrow-right-circle text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Desktop table layout (visible on large screens) -->
+    <div class="d-none d-lg-block">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for media in media_items %}
+                    <tr class="clickable-row" onclick="window.location.href='/media/{{ media.id }}'" style="cursor: pointer;">
+                        <td>{{ media.title or "Untitled" }}</td>
+                        <td>
+                            {% if media.mtype == 1 %}
+                                <i class="bi bi-film"></i> Movie
+                            {% elif media.mtype == 2 %}
+                                <i class="bi bi-tv"></i> TV Show
+                            {% else %}
+                                {{ media.mtype or "Unknown" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if media.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                            
+                            {% if media.flag %}
+                            <span class="badge bg-warning text-dark ms-1">Flagged</span>
+                            {% endif %}
+                            
+                            {% if media.acquire %}
+                            <span class="badge bg-info text-dark ms-1">To Acquire</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty state -->
+    {% if not media_items %}
+    <div class="text-center py-5">
+        <i class="bi bi-collection-play-fill text-muted" style="font-size: 3rem;"></i>
+        <h3 class="text-muted mt-3">No media found</h3>
+        <p class="text-muted">
+            {% if search or status %}
+                No media items match your current filters.
+            {% else %}
+                No media items have been added yet.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Mobile-optimized pagination -->
+    {% if pagination.total_pages > 1 %}
+    <nav aria-label="Media list pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <!-- Previous button -->
+            <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link" 
+                   hx-get="/media/?page={{ pagination.page - 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+                   hx-target="#media-content-container"
+                   hx-include="[name='search'], [name='per_page'], [name='status']">
+                    <i class="bi bi-chevron-left"></i>
+                    <span class="d-none d-sm-inline">Previous</span>
+                </a>
+            </li>
+            
+            <!-- Simplified page numbers for mobile -->
+            <li class="page-item active">
+                <span class="page-link">{{ pagination.page }} of {{ pagination.total_pages }}</span>
+            </li>
+            
+            <!-- Next button -->
+            <li class="page-item {% if pagination.page == pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                   hx-get="/media/?page={{ pagination.page + 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+                   hx-target="#media-content-container"
+                   hx-include="[name='search'], [name='per_page'], [name='status']">
+                    <span class="d-none d-sm-inline">Next</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Desktop-style pagination (hidden on mobile) -->
+        <ul class="pagination justify-content-center d-none d-md-flex">
+            <!-- Previous button -->
+            <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                <a class="page-link" 
+                   hx-get="/media/?page={{ pagination.page - 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+                   hx-target="#media-content-container"
+                   hx-include="[name='search'], [name='per_page'], [name='status']">
+                    Previous
+                </a>
+            </li>
+            
+            <!-- Page numbers -->
+            {% set start_page = [1, pagination.page - 2]|max %}
+            {% set end_page = [pagination.total_pages, start_page + 4]|min %}
+            {% if end_page - start_page < 4 %}
+                {% set start_page = [1, end_page - 4]|max %}
+            {% endif %}
+            
+            {% for p in range(start_page, end_page + 1) %}
+            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                <a class="page-link" 
+                   hx-get="/media/?page={{ p }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+                   hx-target="#media-content-container"
+                   hx-include="[name='search'], [name='per_page'], [name='status']">
+                    {{ p }}
+                </a>
+            </li>
+            {% endfor %}
+            
+            <!-- Next button -->
+            <li class="page-item {% if pagination.page == pagination.total_pages %}disabled{% endif %}">
+                <a class="page-link"
+                   hx-get="/media/?page={{ pagination.page + 1 }}&per_page={{ pagination.per_page }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+                   hx-target="#media-content-container"
+                   hx-include="[name='search'], [name='per_page'], [name='status']">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
