@@ -6,3 +6,6 @@ bmm-rw/.env
 bmm-rw/.env
 bmm-ro/__pycache__/main.cpython-313.pyc
 *.pyc
+bmm-ro/__pycache__/main.cpython-313.pyc
+*.pyc
+/bmm-ro/__pycache__
