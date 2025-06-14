@@ -168,6 +168,7 @@ async def tmdb_search(
     query: str = "",
     search_type: str = Query("movie", regex="^(movie|tv)$"),  # Validate search type
     page: int = Query(1, ge=1),
+    hx_request: Optional[str] = Header(None),
     session: Session = Depends(get_session)
 ):
     results = []
@@ -256,6 +257,11 @@ async def tmdb_search(
         "existing_tmdb_ids": existing_tmdb_ids
     })
     
+    # If it's an HTMX request, return just the content partial
+    if hx_request:
+        return templates.TemplateResponse("partials/tmdb_search_content.html", context)
+    
+    # Otherwise return the full page
     return templates.TemplateResponse("tmdb_search.html", context)
 
 # Create Media from TMDB Route
@@ -374,8 +380,8 @@ async def list_assets(
     # Calculate total pages
     total_pages = (total_count + per_page - 1) // per_page
     
-    # Get assets with pagination
-    assets = session.exec(query.offset(offset).limit(per_page)).all()
+    # Get assets with pagination (sorted alphabetically by title)
+    assets = session.exec(query.order_by(Asset.title).offset(offset).limit(per_page)).all()
     
     # Context for the template
     context = get_base_context(request)
@@ -390,9 +396,9 @@ async def list_assets(
         }
     })
     
-    # If it's an HTMX request, return just the table partial
+    # If it's an HTMX request, return just the content partial
     if hx_request:
-        return templates.TemplateResponse("partials/asset_table.html", context)
+        return templates.TemplateResponse("partials/asset_list_content.html", context)
     
     # Otherwise return the full page
     return templates.TemplateResponse("asset_list.html", context)
@@ -660,8 +666,8 @@ async def list_media(
     # Calculate total pages
     total_pages = (total_count + per_page - 1) // per_page
     
-    # Get media items with pagination
-    media_items = session.exec(query.offset(offset).limit(per_page)).all()
+    # Get media items with pagination (sorted alphabetically by title)
+    media_items = session.exec(query.order_by(Media.title).offset(offset).limit(per_page)).all()
     
     # Context for the template
     context = get_base_context(request)
@@ -677,9 +683,9 @@ async def list_media(
         }
     })
     
-    # If it's an HTMX request, return just the table partial
+    # If it's an HTMX request, return just the content partial
     if hx_request:
-        return templates.TemplateResponse("partials/media_table.html", context)
+        return templates.TemplateResponse("partials/media_list_content.html", context)
     
     # Otherwise return the full page
     return templates.TemplateResponse("media_list.html", context)
