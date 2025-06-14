@@ -1,11 +1,10 @@
 <!-- File: bmm-ro/templates-readonly/partials/asset_list_content.html -->
-<!-- Revision: 1.0 - HTMX partial template for asset list dynamic content -->
+<!-- Revision: 1.1 - HTMX partial template for asset list dynamic content (container moved to main template) -->
 
-<div id="asset-content-container">
-    <!-- Mobile-first responsive layout for assets -->
+<!-- Mobile-first responsive layout for assets -->
     
     <!-- Mobile card layout (hidden on larger screens) -->
-    <div class="d-block d-lg-none">
+    <div class="d-block d-md-none">
         {% for asset in assets %}
         <a href="/assets/{{ asset.id }}" class="text-decoration-none">
             <div class="card mb-3 asset-card clickable-card">
@@ -43,7 +42,7 @@
     </div>
 
     <!-- Desktop table layout (visible on large screens) -->
-    <div class="d-none d-lg-block">
+    <div class="d-none d-md-block">
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead class="table-dark">
@@ -165,4 +164,3 @@
         </ul>
     </nav>
     {% endif %}
-</div>

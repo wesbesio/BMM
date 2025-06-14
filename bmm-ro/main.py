@@ -142,8 +142,8 @@ async def list_assets(
     # Calculate total pages
     total_pages = (total_count + per_page - 1) // per_page
     
-    # Get assets with pagination
-    assets = session.exec(query.offset(offset).limit(per_page)).all()
+    # Get assets with pagination (sorted alphabetically by title)
+    assets = session.exec(query.order_by(Asset.title).offset(offset).limit(per_page)).all()
     
     # Context for the template
     context = get_base_context(request)
@@ -239,8 +239,8 @@ async def list_media(
     # Calculate total pages
     total_pages = (total_count + per_page - 1) // per_page
     
-    # Get media items with pagination
-    media_items = session.exec(query.offset(offset).limit(per_page)).all()
+    # Get media items with pagination (sorted alphabetically by title)
+    media_items = session.exec(query.order_by(Media.title).offset(offset).limit(per_page)).all()
     
     # Context for the template
     context = get_base_context(request)

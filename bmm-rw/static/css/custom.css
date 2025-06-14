@@ -106,7 +106,8 @@
 
 /* Enhanced card styles for mobile */
 .asset-card,
-.media-card {
+.media-card,
+.tmdb-result-card {
     border-radius: 12px;
     border: 1px solid #e9ecef;
     transition: all 0.3s ease;
@@ -114,10 +115,45 @@
 }
 
 .asset-card:hover,
-.media-card:hover {
+.media-card:hover,
+.tmdb-result-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border-color: var(--primary-color);
+}
+
+/* TMDB specific card styles */
+.tmdb-result-card {
+    min-height: 140px;
+}
+
+.tmdb-result-card .card-body {
+    padding: 1rem;
+}
+
+.tmdb-result-card .card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+.tmdb-result-card .card-text {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.tmdb-result-card img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+}
+
+/* TMDB button adjustments for mobile */
+.tmdb-result-card .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
 }
 
 /* Clickable card styles */
