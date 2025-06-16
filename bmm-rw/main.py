@@ -271,42 +271,72 @@ async def create_media_from_tmdb(
     tmdb_id: int,
     session: Session = Depends(get_session)
 ):
-    # Fetch movie details from TMDB
-    async with httpx.AsyncClient() as client:
-        headers = {
-            "accept": "application/json",
-            "Authorization": f"Bearer {TMDB_API_KEY}"
-        }
-        response = await client.get(
-            f"{TMDB_BASE_URL}/movie/{tmdb_id}",
-            headers=headers
+    try:
+        # Check if media with this TMDB ID already exists
+        existing_media = session.exec(
+            select(Media).where(Media.tmdbid == tmdb_id, Media.mtype == 1)
+        ).first()
+        
+        if existing_media:
+            raise HTTPException(
+                status_code=409, 
+                detail=f"Movie with TMDB ID {tmdb_id} already exists in your collection"
+            )
+        
+        # Fetch movie details from TMDB
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            headers = {
+                "accept": "application/json",
+                "Authorization": f"Bearer {TMDB_API_KEY}"
+            }
+            response = await client.get(
+                f"{TMDB_BASE_URL}/movie/{tmdb_id}",
+                headers=headers
+            )
+            
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail="Movie not found on TMDB")
+            elif response.status_code != 200:
+                raise HTTPException(
+                    status_code=503, 
+                    detail=f"TMDB API error: {response.status_code}"
+                )
+            
+            movie_data = response.json()
+        
+        # Validate required data
+        if not movie_data.get("title"):
+            raise HTTPException(status_code=400, detail="Invalid movie data from TMDB")
+        
+        # Create a new Media object with TMDB data
+        media = Media(
+            title=movie_data.get("title"),
+            subtitle=movie_data.get("tagline"),
+            imageurl=f"https://image.tmdb.org/t/p/w92{movie_data.get('poster_path')}" if movie_data.get("poster_path") else None,
+            mtype=1,  # 1 is for movies
+            notes=movie_data.get("overview"),
+            imdbid=movie_data.get("imdb_id"),
+            tmdbid=tmdb_id,
+            active=False,  # Not active until an asset is associated
+            flag=False,
+            acquire=True   # Set to "To Acquire" by default
         )
         
-        if response.status_code != 200:
-            raise HTTPException(status_code=404, detail="Movie not found on TMDB")
+        session.add(media)
+        session.commit()
+        session.refresh(media)
         
-        movie_data = response.json()
-    
-    # Create a new Media object with TMDB data
-    # Start with "To Acquire" status (no asset associated initially)
-    media = Media(
-        title=movie_data.get("title"),
-        subtitle=movie_data.get("tagline"),
-        imageurl=f"https://image.tmdb.org/t/p/w92{movie_data.get('poster_path')}" if movie_data.get("poster_path") else None,
-        mtype=1,  # Assuming 1 is for movies
-        notes=movie_data.get("overview"),
-        imdbid=movie_data.get("imdb_id"),
-        tmdbid=tmdb_id,
-        active=False,  # Not active until an asset is associated
-        flag=False,
-        acquire=True   # Set to "To Acquire" by default
-    )
-    
-    session.add(media)
-    session.commit()
-    session.refresh(media)
-    
-    return RedirectResponse(url=f"/media/{media.id}", status_code=303)
+        return RedirectResponse(url=f"/media/{media.id}?created=movie", status_code=303)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        session.rollback()
+        print(f"ERROR: Failed to create media from TMDB ID {tmdb_id}: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail="Failed to create media. Please try again later."
+        )
 
 # Create Media from TMDB TV Route - New route for TV shows
 @app.get("/media/create-from-tmdb-tv/{tmdb_id}", response_class=HTMLResponse)
@@ -315,42 +345,72 @@ async def create_media_from_tmdb_tv(
     tmdb_id: int,
     session: Session = Depends(get_session)
 ):
-    # Fetch TV show details from TMDB
-    async with httpx.AsyncClient() as client:
-        headers = {
-            "accept": "application/json",
-            "Authorization": f"Bearer {TMDB_API_KEY}"
-        }
-        response = await client.get(
-            f"{TMDB_BASE_URL}/tv/{tmdb_id}",
-            headers=headers
+    try:
+        # Check if TV show with this TMDB ID already exists
+        existing_media = session.exec(
+            select(Media).where(Media.tmdbid == tmdb_id, Media.mtype == 2)
+        ).first()
+        
+        if existing_media:
+            raise HTTPException(
+                status_code=409, 
+                detail=f"TV show with TMDB ID {tmdb_id} already exists in your collection"
+            )
+        
+        # Fetch TV show details from TMDB
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            headers = {
+                "accept": "application/json",
+                "Authorization": f"Bearer {TMDB_API_KEY}"
+            }
+            response = await client.get(
+                f"{TMDB_BASE_URL}/tv/{tmdb_id}",
+                headers=headers
+            )
+            
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail="TV show not found on TMDB")
+            elif response.status_code != 200:
+                raise HTTPException(
+                    status_code=503, 
+                    detail=f"TMDB API error: {response.status_code}"
+                )
+            
+            tv_data = response.json()
+        
+        # Validate required data
+        if not tv_data.get("name"):
+            raise HTTPException(status_code=400, detail="Invalid TV show data from TMDB")
+        
+        # Create a new Media object with TMDB TV data
+        media = Media(
+            title=tv_data.get("name"),  # TV shows use "name" instead of "title"
+            subtitle=tv_data.get("tagline"),
+            imageurl=f"https://image.tmdb.org/t/p/w92{tv_data.get('poster_path')}" if tv_data.get("poster_path") else None,
+            mtype=2,  # 2 is for TV shows
+            notes=tv_data.get("overview"),
+            imdbid=None,  # TV endpoint doesn't return IMDB ID directly
+            tmdbid=tmdb_id,
+            active=False,  # Not active until an asset is associated
+            flag=False,
+            acquire=True   # Set to "To Acquire" by default
         )
         
-        if response.status_code != 200:
-            raise HTTPException(status_code=404, detail="TV show not found on TMDB")
+        session.add(media)
+        session.commit()
+        session.refresh(media)
         
-        tv_data = response.json()
-    
-    # Create a new Media object with TMDB TV data
-    # Start with "To Acquire" status (no asset associated initially)
-    media = Media(
-        title=tv_data.get("name"),  # TV shows use "name" instead of "title"
-        subtitle=tv_data.get("tagline"),
-        imageurl=f"https://image.tmdb.org/t/p/w92{tv_data.get('poster_path')}" if tv_data.get("poster_path") else None,
-        mtype=2,  # 2 is for TV shows
-        notes=tv_data.get("overview"),
-        imdbid=None,  # TV endpoint doesn't return IMDB ID directly
-        tmdbid=tmdb_id,
-        active=False,  # Not active until an asset is associated
-        flag=False,
-        acquire=True   # Set to "To Acquire" by default
-    )
-    
-    session.add(media)
-    session.commit()
-    session.refresh(media)
-    
-    return RedirectResponse(url=f"/media/{media.id}", status_code=303)
+        return RedirectResponse(url=f"/media/{media.id}?created=tv", status_code=303)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        session.rollback()
+        print(f"ERROR: Failed to create TV show from TMDB ID {tmdb_id}: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail="Failed to create TV show. Please try again later."
+        )
 
 # Asset Routes
 @app.get("/assets/", response_class=HTMLResponse)

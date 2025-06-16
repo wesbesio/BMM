@@ -67,13 +67,17 @@
                             <small class="text-muted d-block text-center mt-1">This media is already in your collection</small>
                         {% else %}
                             {% if search_type == "movie" %}
-                                <a href="/media/create-from-tmdb/{{ item.id }}" class="btn btn-sm btn-success w-100">
-                                    <i class="bi bi-plus-circle"></i> Create Media
-                                </a>
+                                <form method="get" action="/media/create-from-tmdb/{{ item.id }}" class="d-inline" hx-boost="false">
+                                    <button type="submit" class="btn btn-sm btn-success w-100">
+                                        <i class="bi bi-plus-circle"></i> Create Media
+                                    </button>
+                                </form>
                             {% else %}
-                                <a href="/media/create-from-tmdb-tv/{{ item.id }}" class="btn btn-sm btn-success w-100">
-                                    <i class="bi bi-plus-circle"></i> Create Media
-                                </a>
+                                <form method="get" action="/media/create-from-tmdb-tv/{{ item.id }}" class="d-inline" hx-boost="false">
+                                    <button type="submit" class="btn btn-sm btn-success w-100">
+                                        <i class="bi bi-plus-circle"></i> Create Media
+                                    </button>
+                                </form>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -140,13 +144,17 @@
                         <small class="text-muted d-block">This media is already in your collection</small>
                     {% else %}
                         {% if search_type == "movie" %}
-                            <a href="/media/create-from-tmdb/{{ item.id }}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus-circle"></i> Create Media
-                            </a>
+                            <form method="get" action="/media/create-from-tmdb/{{ item.id }}" class="d-inline" hx-boost="false">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-plus-circle"></i> Create Media
+                                </button>
+                            </form>
                         {% else %}
-                            <a href="/media/create-from-tmdb-tv/{{ item.id }}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus-circle"></i> Create Media
-                            </a>
+                            <form method="get" action="/media/create-from-tmdb-tv/{{ item.id }}" class="d-inline" hx-boost="false">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-plus-circle"></i> Create Media
+                                </button>
+                            </form>
                         {% endif %}
                     {% endif %}
                 </td>

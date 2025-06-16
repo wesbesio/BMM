@@ -4,7 +4,11 @@
       "Bash(mkdir:*)",
       "Bash(python:*)",
       "Bash(find:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(sqlite3:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }
