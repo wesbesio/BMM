@@ -306,6 +306,13 @@ async def create_media_from_tmdb(
     session.commit()
     session.refresh(media)
     
+    # Check if this is an HTMX request
+    if request.headers.get("HX-Request"):
+        from fastapi.responses import Response
+        response = Response(status_code=200)
+        response.headers["HX-Redirect"] = f"/media/{media.id}"
+        return response
+    
     return RedirectResponse(url=f"/media/{media.id}", status_code=303)
 
 # Create Media from TMDB TV Route - New route for TV shows
@@ -349,6 +356,13 @@ async def create_media_from_tmdb_tv(
     session.add(media)
     session.commit()
     session.refresh(media)
+    
+    # Check if this is an HTMX request
+    if request.headers.get("HX-Request"):
+        from fastapi.responses import Response
+        response = Response(status_code=200)
+        response.headers["HX-Redirect"] = f"/media/{media.id}"
+        return response
     
     return RedirectResponse(url=f"/media/{media.id}", status_code=303)
 
